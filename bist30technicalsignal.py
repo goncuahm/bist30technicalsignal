@@ -49,12 +49,11 @@ def get_fundamental_ratios(ticker):
             'pe': info.get('trailingPE', None),
             'pb': info.get('priceToBook', None),
             'roe': info.get('returnOnEquity', None),
-            'debt_to_equity': info.get('debtToEquity', None),
             'profit_margin': info.get('profitMargins', None)
         }
         return ratios
     except:
-        return {'pe': None, 'pb': None, 'roe': None, 'debt_to_equity': None, 'profit_margin': None}
+        return {'pe': None, 'pb': None, 'roe': None, 'profit_margin': None}
 
 # ------------------------------
 # EPS Function
@@ -161,7 +160,6 @@ for ticker in bist30_tickers:
             "P/E": round(ratios['pe'], 2) if ratios['pe'] is not None else "N/A",
             "P/B": round(ratios['pb'], 2) if ratios['pb'] is not None else "N/A",
             "ROE": round(ratios['roe'] * 100, 2) if ratios['roe'] is not None else "N/A",
-            "Debt/Equity": round(ratios['debt_to_equity'], 2) if ratios['debt_to_equity'] is not None else "N/A",
             "Profit Margin": round(ratios['profit_margin'] * 100, 2) if ratios['profit_margin'] is not None else "N/A",
         })
 
@@ -181,7 +179,6 @@ fundamental_df = pd.DataFrame(fundamental_results)
 valid_pe = [r['pe'] for r in all_ratios if r['pe'] is not None and r['pe'] > 0]
 valid_pb = [r['pb'] for r in all_ratios if r['pb'] is not None and r['pb'] > 0]
 valid_roe = [r['roe'] for r in all_ratios if r['roe'] is not None]
-valid_debt = [r['debt_to_equity'] for r in all_ratios if r['debt_to_equity'] is not None and r['debt_to_equity'] >= 0]
 valid_margin = [r['profit_margin'] for r in all_ratios if r['profit_margin'] is not None]
 
 # Calculate fundamental scores
@@ -409,7 +406,6 @@ else:
     st.info("Select a stock above to generate RSI LSTM forecast.")
 
 st.caption("Developed for educational and research purposes — RSI Strategy + LSTM Forecast on BIST30.")
-
 
 
 
