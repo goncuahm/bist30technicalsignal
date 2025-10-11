@@ -24,6 +24,8 @@ sell_threshold = 64
 tcost = 0.002
 
 # Display parameters
+st.info(f"**Strategy Parameters:** Period = {period} | Transaction Cost = {tcost*100}%")
+
 # st.info(f"**Strategy Parameters:** Period = {period} | RSI Period = {rsi_period} | Buy Threshold (RSI < {buy_threshold}) | Sell Threshold (RSI > {sell_threshold}) | Transaction Cost = {tcost*100}%")
 
 # ------------------------------
