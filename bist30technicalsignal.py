@@ -12,7 +12,7 @@ st.set_page_config(page_title="BIST30 Technical & Fundamental Strategy with Mach
 # ------------------------------
 # Title
 # ------------------------------
-st.title("📊 BIST30 Technical Strategy — Backtest & LSTM Forecast")
+st.title("📊 BIST30 Fundamental & Technical Strategy — Backtest & LSTM Forecast")
 
 # ------------------------------
 # Fixed Parameters (Default Values)
@@ -20,11 +20,11 @@ st.title("📊 BIST30 Technical Strategy — Backtest & LSTM Forecast")
 period = "1y"
 rsi_period = 9
 buy_threshold = 40
-sell_threshold = 63
+sell_threshold = 64
 tcost = 0.002
 
 # Display parameters
-st.info(f"**Strategy Parameters:** Period = {period} | RSI Period = {rsi_period} | Buy Threshold (RSI < {buy_threshold}) | Sell Threshold (RSI > {sell_threshold}) | Transaction Cost = {tcost*100}%")
+# st.info(f"**Strategy Parameters:** Period = {period} | RSI Period = {rsi_period} | Buy Threshold (RSI < {buy_threshold}) | Sell Threshold (RSI > {sell_threshold}) | Transaction Cost = {tcost*100}%")
 
 # ------------------------------
 # Define BIST30 tickers
@@ -272,7 +272,7 @@ TOTAL_CAPITAL = 1000000  # Total capital in Liras
 total_trades = results_df["Number of Trades"].sum()
 
 if total_trades > 0:
-    capital_per_trade = TOTAL_CAPITAL / total_trades
+    capital_per_trade = TOTAL_CAPITAL / (total_trades/3)
 else:
     capital_per_trade = 0
 
