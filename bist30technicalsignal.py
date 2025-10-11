@@ -114,6 +114,8 @@ st.subheader("🔍 Scanning BIST30 Stocks...")
 results = []
 buy_signals = []
 sell_signals = []
+fundamental_results = []
+all_ratios = []
 
 for ticker in bist30_tickers:
     try:
@@ -126,32 +128,41 @@ for ticker in bist30_tickers:
         total_return, avg_return, trades = backtest_strategy(data, buy_threshold, sell_threshold, tcost)
         latest_rsi = float(data["RSI"].iloc[-1])
         latest_close = float(data["Close"].iloc[-1])
-        
+
         # Fetch EPS
         eps = get_eps(ticker)
+        
+        # Fetch fundamental ratios
+        ratios = get_fundamental_ratios(ticker)
+        all_ratios.append(ratios)
 
+        # Technical signal (preliminary)
+        technical_signal = "HOLD"
         if latest_rsi < buy_threshold:
-            # Only add to buy signals if EPS is positive
             if not np.isnan(eps) and eps > 0:
-                signal = "BUY"
-                buy_signals.append((ticker, latest_close, latest_rsi, eps))
-            else:
-                signal = "HOLD"
+                technical_signal = "BUY"
         elif latest_rsi > sell_threshold:
-            signal = "SELL"
-            sell_signals.append((ticker, latest_close, latest_rsi, eps))
-        else:
-            signal = "HOLD"
+            technical_signal = "SELL"
 
         results.append({
             "Ticker": ticker,
-            "Signal": signal,
+            "Technical Signal": technical_signal,
             "Latest RSI": round(latest_rsi, 2),
             "Latest Close": round(latest_close, 2),
             "EPS": round(eps, 4) if not np.isnan(eps) else "N/A",
             "Cumulative Return (%)": round(total_return * 100, 2),
             "Return per Trade (%)": round(avg_return * 100, 2),
             "Number of Trades": len(trades)
+        })
+        
+        # Store fundamental data
+        fundamental_results.append({
+            "Ticker": ticker,
+            "P/E": round(ratios['pe'], 2) if ratios['pe'] is not None else "N/A",
+            "P/B": round(ratios['pb'], 2) if ratios['pb'] is not None else "N/A",
+            "ROE": round(ratios['roe'] * 100, 2) if ratios['roe'] is not None else "N/A",
+            "Debt/Equity": round(ratios['debt_to_equity'], 2) if ratios['debt_to_equity'] is not None else "N/A",
+            "Profit Margin": round(ratios['profit_margin'] * 100, 2) if ratios['profit_margin'] is not None else "N/A",
         })
 
     except Exception as e:
@@ -239,6 +250,10 @@ combined_df.loc[(combined_df['Technical Signal'] == 'SELL') & (combined_df['Fund
 buy_signal_tickers = combined_df[combined_df['Final Signal'] == 'BUY']
 sell_signal_tickers = combined_df[combined_df['Final Signal'] == 'SELL']
 
+# Clear previous buy/sell signals and create new ones
+buy_signals = []
+sell_signals = []
+
 # Create buy/sell signal lists with details
 for _, row in buy_signal_tickers.iterrows():
     buy_signals.append((row['Ticker'], row['Latest Close'], row['Latest RSI'], row['EPS']))
@@ -266,7 +281,7 @@ if buy_signals:
     buy_df = pd.DataFrame(buy_signals, columns=["Ticker", "Close Price", "RSI", "EPS"])
     buy_df["Close Price"] = buy_df["Close Price"].round(2)
     buy_df["RSI"] = buy_df["RSI"].round(2)
-    buy_df["EPS"] = buy_df["EPS"].round(4)
+    buy_df["EPS"] = buy_df["EPS"].apply(lambda x: round(x, 4) if not pd.isna(x) and x != "N/A" else "N/A")
     # Calculate order size (number of shares)
     buy_df["Order Size"] = (capital_per_trade / buy_df["Close Price"]).apply(lambda x: int(round(x)))
 else:
@@ -276,7 +291,7 @@ if sell_signals:
     sell_df = pd.DataFrame(sell_signals, columns=["Ticker", "Close Price", "RSI", "EPS"])
     sell_df["Close Price"] = sell_df["Close Price"].round(2)
     sell_df["RSI"] = sell_df["RSI"].round(2)
-    sell_df["EPS"] = sell_df["EPS"].apply(lambda x: round(x, 4) if not np.isnan(x) else "N/A")
+    sell_df["EPS"] = sell_df["EPS"].apply(lambda x: round(x, 4) if not pd.isna(x) and x != "N/A" else "N/A")
     # Calculate order size (number of shares)
     sell_df["Order Size"] = (capital_per_trade / sell_df["Close Price"]).apply(lambda x: int(round(x)))
 else:
@@ -285,7 +300,11 @@ else:
 # ------------------------------
 # Display Results
 # ------------------------------
-st.subheader("📈 RSI Strategy Results (BIST30)")
+st.subheader("📊 Fundamental Analysis Results (BIST30)")
+st.info("💡 **Fundamental Score**: Higher score (closer to 100) = More Undervalued | Lower score (closer to 0) = More Overvalued")
+st.dataframe(fundamental_df, use_container_width=True)
+
+st.subheader("📈 Technical Strategy Results (BIST30)")
 st.dataframe(results_df, use_container_width=True)
 
 # Display capital allocation info
@@ -302,7 +321,7 @@ with col1:
 
 with col2:
     st.subheader("🔴 Current SELL Signals")
-    st.caption("Stocks where BOTH Technical (RSI > 65) AND Fundamental (Top 10 Overvalued) agree")
+    st.caption("Stocks where BOTH Technical (RSI > 63) AND Fundamental (Top 10 Overvalued) agree")
     if not sell_df.empty:
         st.dataframe(sell_df, use_container_width=True)
     else:
@@ -341,7 +360,7 @@ def lstm_forecast_rsi(rsi_series, n_past=9, n_future=4):
     model.fit(X, y, epochs=30, batch_size=8, verbose=0)
 
     last_window = rsi_scaled[-n_past:].reshape((1, n_past, 1))
-    forecast_scaled = model.predict(last_window)
+    forecast_scaled = model.predict(last_window, verbose=0)
     forecast = scaler.inverse_transform(forecast_scaled.reshape(-1, 1)).flatten()
     return forecast
 
@@ -395,6 +414,10 @@ else:
     st.info("Select a stock above to generate RSI LSTM forecast.")
 
 st.caption("Developed for educational and research purposes — RSI Strategy + LSTM Forecast on BIST30.")
+
+
+
+
 
 
 
