@@ -20,7 +20,7 @@ st.title("📊 BIST30 Technical Strategy — Backtest & LSTM Forecast")
 period = "1y"
 rsi_period = 9
 buy_threshold = 40
-sell_threshold = 63
+sell_threshold = 65
 tcost = 0.002
 
 # Display parameters
