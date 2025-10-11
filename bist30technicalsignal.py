@@ -7,7 +7,7 @@ from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
-st.set_page_config(page_title="BIST30 Technical & Fundamental Strategy with Machine Forecast", layout="wide")
+st.set_page_config(page_title="BIST30 Technical & Fundamental Strategy with LSTM Forecast", layout="wide")
 
 # ------------------------------
 # Title
