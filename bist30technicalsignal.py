@@ -177,7 +177,7 @@ else:
 # ------------------------------
 # Display Results
 # ------------------------------
-st.subheader("📈 RSI Strategy Results (BIST30)")
+st.subheader("📈 Technical Strategy Results (BIST30)")
 st.dataframe(results_df, use_container_width=True)
 
 # Display capital allocation info
