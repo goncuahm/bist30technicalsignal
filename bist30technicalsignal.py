@@ -257,15 +257,40 @@ if selected_ticker != "None":
     st.dataframe(forecast_df, use_container_width=True)
 
     # Mini plot for Close price
-    st.write("📉 Recent Close Price Trend")
-    fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(data.index[-100:], data["Close"].iloc[-100:], label="Close", color="steelblue")
-    ax.set_title(f"{selected_ticker} — Recent Close Prices")
-    ax.set_xlabel("Date")
-    ax.set_ylabel("Close Price")
-    ax.legend()
-    st.pyplot(fig)
+    # st.write("📉 Recent Close Price Trend")
+    # fig, ax = plt.subplots(figsize=(10, 4))
+    # ax.plot(data.index[-100:], data["Close"].iloc[-100:], label="Close", color="steelblue")
+    # ax.set_title(f"{selected_ticker} — Recent Close Prices")
+    # ax.set_xlabel("Date")
+    # ax.set_ylabel("Close Price")
+    # ax.legend()
+    # st.pyplot(fig)
 
+    # Plot RSI with forecast
+    st.write("📊 RSI Trend with Forecast")
+    fig, ax = plt.subplots(figsize=(10, 4))
+    
+    # Plot historical RSI
+    ax.plot(data.index[-100:], data["RSI"].iloc[-100:], label="Historical RSI", color="steelblue", linewidth=2)
+    
+    # Create future dates for forecast (assuming daily data)
+    last_date = data.index[-1]
+    forecast_dates = pd.date_range(start=last_date, periods=5, freq='D')[1:]  # Next 4 days
+    
+    # Plot forecast RSI
+    ax.plot(forecast_dates, forecast, label="Forecasted RSI", color="orange", linewidth=2, linestyle='--', marker='o')
+    
+    # Add horizontal lines for buy/sell thresholds
+    ax.axhline(y=buy_threshold, color='green', linestyle=':', alpha=0.7, label=f'Buy Threshold ({buy_threshold})')
+    ax.axhline(y=sell_threshold, color='red', linestyle=':', alpha=0.7, label=f'Sell Threshold ({sell_threshold})')
+    
+    ax.set_title(f"{selected_ticker} — RSI with 4-Day Forecast")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("RSI")
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    st.pyplot(fig)
+    
 else:
     st.info("Select a stock above to generate RSI LSTM forecast.")
 
