@@ -7,12 +7,12 @@ from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
-st.set_page_config(page_title="BIST30 Technical & Fundamental Strategy with LSTM Forecast", layout="wide")
+st.set_page_config(page_title="BIST30 Technical & Fundamental Strategy with Machine Forecast", layout="wide")
 
 # ------------------------------
 # Title
 # ------------------------------
-st.title("📊 BIST30 Fundamental & Technical Strategy — Backtest & LSTM Forecast")
+st.title("📊 BIST30 Technical Strategy — Backtest & LSTM Forecast")
 
 # ------------------------------
 # Fixed Parameters (Default Values)
@@ -20,12 +20,10 @@ st.title("📊 BIST30 Fundamental & Technical Strategy — Backtest & LSTM Forec
 period = "1y"
 rsi_period = 9
 buy_threshold = 40
-sell_threshold = 64
+sell_threshold = 63
 tcost = 0.002
 
-# Display parameters
-st.info(f"**Strategy Parameters:** Period = {period} | Transaction Cost = {tcost*100}%")
-
+# Display parameters (commented out)
 # st.info(f"**Strategy Parameters:** Period = {period} | RSI Period = {rsi_period} | Buy Threshold (RSI < {buy_threshold}) | Sell Threshold (RSI > {sell_threshold}) | Transaction Cost = {tcost*100}%")
 
 # ------------------------------
@@ -191,30 +189,25 @@ def calculate_fundamental_score(idx):
     ratios = all_ratios[idx]
     score_components = []
     
-    # P/E Score (lower is better)
+    # P/E Score (lower is better) - Weight: 30%
     if ratios['pe'] is not None and ratios['pe'] > 0 and len(valid_pe) > 1:
         pe_score = 100 * (max(valid_pe) - ratios['pe']) / (max(valid_pe) - min(valid_pe))
-        score_components.append((pe_score, 0.25))
+        score_components.append((pe_score, 0.30))
     
-    # P/B Score (lower is better)
+    # P/B Score (lower is better) - Weight: 25%
     if ratios['pb'] is not None and ratios['pb'] > 0 and len(valid_pb) > 1:
         pb_score = 100 * (max(valid_pb) - ratios['pb']) / (max(valid_pb) - min(valid_pb))
-        score_components.append((pb_score, 0.20))
+        score_components.append((pb_score, 0.25))
     
-    # ROE Score (higher is better)
+    # ROE Score (higher is better) - Weight: 25%
     if ratios['roe'] is not None and len(valid_roe) > 1:
         roe_score = 100 * (ratios['roe'] - min(valid_roe)) / (max(valid_roe) - min(valid_roe))
         score_components.append((roe_score, 0.25))
     
-    # Debt/Equity Score (lower is better)
-    if ratios['debt_to_equity'] is not None and ratios['debt_to_equity'] >= 0 and len(valid_debt) > 1:
-        debt_score = 100 * (max(valid_debt) - ratios['debt_to_equity']) / (max(valid_debt) - min(valid_debt))
-        score_components.append((debt_score, 0.15))
-    
-    # Profit Margin Score (higher is better)
+    # Profit Margin Score (higher is better) - Weight: 20%
     if ratios['profit_margin'] is not None and len(valid_margin) > 1:
         margin_score = 100 * (ratios['profit_margin'] - min(valid_margin)) / (max(valid_margin) - min(valid_margin))
-        score_components.append((margin_score, 0.15))
+        score_components.append((margin_score, 0.20))
     
     if not score_components:
         return None
@@ -274,7 +267,7 @@ TOTAL_CAPITAL = 1000000  # Total capital in Liras
 total_trades = results_df["Number of Trades"].sum()
 
 if total_trades > 0:
-    capital_per_trade = TOTAL_CAPITAL / (total_trades/3)
+    capital_per_trade = TOTAL_CAPITAL / total_trades
 else:
     capital_per_trade = 0
 
@@ -416,9 +409,6 @@ else:
     st.info("Select a stock above to generate RSI LSTM forecast.")
 
 st.caption("Developed for educational and research purposes — RSI Strategy + LSTM Forecast on BIST30.")
-
-
-
 
 
 
