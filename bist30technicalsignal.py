@@ -20,7 +20,7 @@ st.title("📊 BIST30 Technical Strategy — Backtest & LSTM Forecast")
 period = "1y"
 rsi_period = 9
 buy_threshold = 40
-sell_threshold = 63
+sell_threshold = 64
 tcost = 0.002
 
 # Display parameters (commented out)
@@ -271,7 +271,7 @@ TOTAL_CAPITAL = 1000000  # Total capital in Liras
 total_trades = results_df["Number of Trades"].sum()
 
 if total_trades > 0:
-    capital_per_trade = TOTAL_CAPITAL / total_trades
+    capital_per_trade = TOTAL_CAPITAL / (total_trades/3)
 else:
     capital_per_trade = 0
 
