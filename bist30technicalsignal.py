@@ -12,7 +12,7 @@ st.set_page_config(page_title="BIST30 Technical & Fundamental Strategy with Mach
 # ------------------------------
 # Title
 # ------------------------------
-st.title("📊 BIST30 Technical Strategy — Backtest & LSTM Forecast")
+st.title("📊 BIST30 Fundamental Analysis & Technical Strategy & Backtest & LSTM Forecast")
 
 # ------------------------------
 # Fixed Parameters (Default Values)
